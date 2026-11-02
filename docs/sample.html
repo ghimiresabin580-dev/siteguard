@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample document</title>
+  <style>body{font-family:system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 16px;line-height:1.5}</style>
+</head>
+<body>
+  <h1 id="t">Document</h1>
+  <p>This is a placeholder page. In your real site, change the document's link to the real PDF
+  (for example <code>/docs/traffic-plan.pdf</code> after copying the PDF into <code>wwwroot/docs</code>,
+  or a link to your document system).</p>
+  <script>
+    var n = new URLSearchParams(location.search).get('name');
+    if (n) { document.getElementById('t').textContent = n; document.title = n; }
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f2a43">
+  <title>SiteGuard</title>
+  <meta name="description" content="SiteGuard demo: construction site safety app with a real site map, safety reports, shift checks and vehicle inspections with HSE email reminders.">
+  <meta property="og:title" content="SiteGuard">
+  <meta property="og:description" content="Construction site safety app: real site map, safety reports, shift checks and vehicle inspections with HSE email reminders.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SiteGuard">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="lib/leaflet/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <header>
+    <h1>SiteGuard</h1>
+    <div class="head-right">
+      <input id="who" placeholder="Your name" maxlength="60" autocomplete="name">
+      <button id="serverBtn" class="ghost sm" data-act="changeServer" title="Server address" hidden>⚙️</button>
+    </div>
+  </header>
+
+  <div class="demo-bar"><div class="demo-in">
+    <p><b>Demo</b> with sample data. Changes are not saved and no emails are sent.</p>
+    <a class="btn demo-btn" href="SiteGuard.zip" download>Download the project (.zip)</a>
+  </div></div>
+
+  <div id="alertBar" hidden></div>
+  <div id="toast" hidden></div>
+
+  <main id="view"></main>
+
+  <nav id="nav">
+    <button data-act="tab" data-tab="map"><span>🗺️</span>Map</button>
+    <button data-act="tab" data-tab="report"><span>⚠️</span>Report</button>
+    <button data-act="tab" data-tab="checks"><span>✅</span>Checks</button>
+    <button data-act="tab" data-tab="lift"><span>🏗️</span>Lift</button>
+    <button data-act="tab" data-tab="docs"><span>📄</span>Permits</button>
+    <button data-act="tab" data-tab="vehicles"><span>🚜</span>Vehicles</button>
+    <button data-act="tab" data-tab="machine"><span>📻</span>Machines</button>
+    <button data-act="tab" data-tab="clean"><span>🧹</span>Cleaning</button>
+    <button data-act="tab" data-tab="summary"><span>📊</span>Weekly</button>
+  </nav>
+
+  <div id="mailSheet" class="sheet" hidden>
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="mailHeading">
+      <div class="sheet-head"><b id="mailHeading">Email to HSE</b><button type="button" id="mailClose" class="ghost sm">Close</button></div>
+      <p class="sheet-note"><span id="mailKind"></span> · demo preview, nothing was sent</p>
+      <dl class="mail-meta">
+        <dt>From</dt><dd>SiteGuard &lt;siteguard@yourcompany.com&gt;</dd>
+        <dt>To</dt><dd>hse@yourcompany.com</dd>
+        <dt>Subject</dt><dd id="mailSubject"></dd>
+      </dl>
+      <div id="mailBody" class="mail-body"></div>
+    </div>
+  </div>
+
+  <!-- demo.js stands in for the SiteGuard server with sample data; app.js is the real app -->
+  <script src="lib/leaflet/leaflet.js"></script>
+  <script src="demo.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

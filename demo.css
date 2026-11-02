@@ -1,0 +1,18 @@
+/* SiteGuard website demo: the strip under the header and the email preview */
+:root { --demo-bg: #fde68a; --demo-fg: #3b2a04; --sheet-shade: rgba(15,23,42,.55); }
+.demo-bar { background: var(--demo-bg); color: var(--demo-fg); font-size: 14px; line-height: 1.4; }
+.demo-in { max-width: 760px; margin: 0 auto; padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; }
+.demo-in p { margin: 0; min-width: 0; flex: 1 1 260px; }
+.demo-btn { padding: 8px 12px; font-size: 13px; border-radius: 10px; text-decoration: none; display: inline-block; }
+.demo-note { font-size: 13px; color: var(--muted); margin: -4px 2px 12px; line-height: 1.45; }
+.demo-note a { color: var(--navy); font-weight: 600; }
+.sheet { position: fixed; inset: 0; z-index: 60; background: var(--sheet-shade); display: flex; align-items: flex-end; justify-content: center; padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px)); }
+.sheet-card { background: var(--card); color: var(--text); width: 100%; max-width: 680px; max-height: 88vh; overflow: auto; border-radius: 16px 16px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -8px 30px rgba(0,0,0,.25); }
+@media (min-width: 700px) { .sheet { align-items: center; } .sheet-card { border-radius: 16px; } }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.sheet-head b { font-size: 18px; }
+.sheet-note { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.mail-meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 14px; margin: 12px 0; }
+.mail-meta dt { color: var(--muted); }
+.mail-meta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.mail-body { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: #ffffff; overflow-x: auto; }
