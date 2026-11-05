@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f2a43">
+  <meta name="theme-color" content="#13263a">
   <title>SiteGuard</title>
-  <meta name="description" content="SiteGuard demo: construction site safety app with a real site map, safety reports, shift checks and vehicle inspections with HSE email reminders.">
+  <meta name="description" content="SiteGuard: daily safety and coordination for construction sites. Morning meeting, permits to work, SPAs, observations, deliveries and inspections.">
   <meta property="og:title" content="SiteGuard">
-  <meta property="og:description" content="Construction site safety app: real site map, safety reports, shift checks and vehicle inspections with HSE email reminders.">
+  <meta property="og:description" content="Daily safety and coordination for construction sites: morning meeting, permits, SPAs, observations, deliveries and inspections.">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -15,57 +15,69 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="SiteGuard">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preload" href="fonts/barlow-400.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="fonts/barlow-sc-600.woff" as="font" type="font/woff" crossorigin>
   <link rel="stylesheet" href="lib/leaflet/leaflet.css">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="demo.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="lib/leaflet/leaflet.js" defer></script>
+  <script type="module" src="js/app.js"></script>
 </head>
 <body>
-  <header>
-    <h1>SiteGuard</h1>
-    <div class="head-right">
-      <input id="who" placeholder="Your name" maxlength="60" autocomplete="name">
-      <button id="serverBtn" class="ghost sm" data-act="changeServer" title="Server address" hidden>⚙️</button>
+  <!-- hazard-tape fill for exclusion zones on the maps -->
+  <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="hazard" patternUnits="userSpaceOnUse" width="16" height="16" patternTransform="rotate(45)">
+        <rect width="16" height="16" fill="#f5b800"/><rect width="8" height="16" fill="#111111"/>
+      </pattern>
+    </defs>
+  </svg>
+
+  <div id="login" class="login" hidden></div>
+
+  <div id="app" class="shell" hidden>
+    <aside id="sidebar" class="sidebar" aria-label="Navigation">
+      <div class="side-top">
+        <a class="brand" href="#/dashboard"><span id="brandLogo"></span><span>SiteGuard</span></a>
+        <button type="button" class="icon-btn side-close" data-act="closeNav" aria-label="Close menu">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>
+      <div class="site-card">
+        <span class="site-label">Site</span>
+        <b id="siteName"></b>
+        <small id="siteProject"></small>
+      </div>
+      <nav id="nav" aria-label="Main"></nav>
+      <div id="navFoot" class="nav-foot"></div>
+    </aside>
+    <div class="scrim" data-act="closeNav" aria-hidden="true"></div>
+
+    <div class="main">
+      <header class="topbar">
+        <button type="button" id="navToggle" class="icon-btn menu-btn" data-act="toggleNav" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
+        <span id="pageIcon" class="page-icon" aria-hidden="true"></span>
+        <div class="page-titles"><h1 id="pageTitle"></h1><p id="pageSub" hidden></p></div>
+        <div id="pageActions" class="page-actions"></div>
+        <div class="tools">
+          <span id="weatherChip" class="wx-chip" hidden></span>
+          <button type="button" id="bellBtn" class="icon-btn bell" data-act="bell" aria-label="Notifications">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+            <b id="bellCount" hidden></b></button>
+          <button type="button" id="userBtn" class="user-btn" data-act="account" aria-haspopup="true"></button>
+          <div id="notePop" class="pop notes-pop" hidden></div>
+          <div id="accountPop" class="pop account-pop" hidden></div>
+        </div>
+      </header>
+      <main id="view" class="view" tabindex="-1"></main>
     </div>
-  </header>
 
-  <div class="demo-bar"><div class="demo-in">
-    <p><b>Demo</b> with sample data. Changes are not saved and no emails are sent.</p>
-    <a class="btn demo-btn" href="SiteGuard.zip" download>Download the project (.zip)</a>
-  </div></div>
-
-  <div id="alertBar" hidden></div>
-  <div id="toast" hidden></div>
-
-  <main id="view"></main>
-
-  <nav id="nav">
-    <button data-act="tab" data-tab="map"><span>🗺️</span>Map</button>
-    <button data-act="tab" data-tab="report"><span>⚠️</span>Report</button>
-    <button data-act="tab" data-tab="checks"><span>✅</span>Checks</button>
-    <button data-act="tab" data-tab="lift"><span>🏗️</span>Lift</button>
-    <button data-act="tab" data-tab="docs"><span>📄</span>Permits</button>
-    <button data-act="tab" data-tab="vehicles"><span>🚜</span>Vehicles</button>
-    <button data-act="tab" data-tab="machine"><span>📻</span>Machines</button>
-    <button data-act="tab" data-tab="clean"><span>🧹</span>Cleaning</button>
-    <button data-act="tab" data-tab="summary"><span>📊</span>Weekly</button>
-  </nav>
-
-  <div id="mailSheet" class="sheet" hidden>
-    <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="mailHeading">
-      <div class="sheet-head"><b id="mailHeading">Email to HSE</b><button type="button" id="mailClose" class="ghost sm">Close</button></div>
-      <p class="sheet-note"><span id="mailKind"></span> · demo preview, nothing was sent</p>
-      <dl class="mail-meta">
-        <dt>From</dt><dd>SiteGuard &lt;siteguard@yourcompany.com&gt;</dd>
-        <dt>To</dt><dd>hse@yourcompany.com</dd>
-        <dt>Subject</dt><dd id="mailSubject"></dd>
-      </dl>
-      <div id="mailBody" class="mail-body"></div>
-    </div>
+    <button type="button" id="fab" class="fab" data-act="raiseObservation" hidden>
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>Report</span></button>
   </div>
 
-  <!-- demo.js stands in for the SiteGuard server with sample data; app.js is the real app -->
-  <script src="lib/leaflet/leaflet.js"></script>
-  <script src="demo.js"></script>
-  <script src="app.js"></script>
+  <dialog id="dlg"></dialog>
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div id="tip" class="tip" role="tooltip" hidden></div>
+  <noscript><p class="noscript">SiteGuard needs JavaScript. Switch it on in the browser settings and reload.</p></noscript>
 </body>
 </html>
