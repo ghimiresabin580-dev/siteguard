@@ -22,7 +22,7 @@ export const CONFIG = {
   // After activating, FormSubmit also emails a random alias you can use here instead
   // of the address, so the address does not appear in the page source.
   mail: {
-    to: 'ghimiresabin580@gmail.com',
+    to: 'ffe626855b2cd27abe235fd03eca92fb',
     endpoint: 'https://formsubmit.co/ajax/',
     dailyLimit: 40
   },
