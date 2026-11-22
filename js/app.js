@@ -30,12 +30,15 @@ import admin from './views/admin.js';
 
 const VIEWS = { dashboard, meeting, map: sitemap, lookahead, deliveries, observations, spa, permits, inspections, plant, workforce, reports, contacts, profile, admin };
 
-const NAV = [
-  { items: ['dashboard', 'meeting', 'map'] },
-  { label: 'Planning', items: ['lookahead', 'deliveries'] },
-  { label: 'Safety', items: ['observations', 'spa', 'permits', 'inspections'] },
-  { label: 'Resources', items: ['plant', 'workforce'] },
-  { items: ['reports'] }
+// The side menu. Other pages still exist and open from links inside the app;
+// add them back here when they are ready to show.
+const MENU = [
+  { key: 'dashboard', icon: 'layout-dashboard', title: 'Dashboard', desc: 'Overview of reported hazards and safety status.' },
+  { key: 'report', icon: 'triangle-exclamation-point', title: 'Report Hazard', desc: 'Report a hazard with description, photo and location.', perm: 'obs.create' },
+  { key: 'observations', icon: 'clipboard-check', title: 'View Reports', desc: 'View previously submitted hazard reports.' },
+  { key: 'map', icon: 'map', title: 'Site Map', desc: 'View the construction site and hazard locations.' },
+  { key: 'reports', icon: 'chart-column', title: 'Statistics', desc: 'Display total reports and hazard status.' },
+  { key: 'profile', icon: 'settings', title: 'Settings', desc: 'Basic application settings.' }
 ];
 
 // Every screen adds its click, submit and change handlers to one registry
@@ -67,6 +70,12 @@ function show() {
   const user = auth.currentUser();
   if (!user) return showLogin();
   if (user.mustChangePassword) return showPasswordChange(user);
+  let openReport = false;
+  if (location.hash === '#/report') {
+    // "Report Hazard" opens the reports list with the new-hazard form on top
+    openReport = auth.can('obs.create', user);
+    history.replaceState(null, '', '#/observations');
+  }
   route = parseHash();
   let v = VIEWS[route.view];
   if (v.allowed && !v.allowed(user)) {
@@ -84,6 +93,7 @@ function show() {
   renderChrome();
   renderView();
   if (!same) window.scrollTo(0, 0);
+  if (openReport) observations.openForm(ctx);
 }
 
 function renderHeader(withActions = true) {
@@ -120,17 +130,10 @@ function renderChrome() {
   const user = auth.currentUser();
   if (!user) return;
   const s = store.settings();
-  $('#siteName').textContent = s.siteName;
-  $('#siteProject').textContent = s.project;
-  $('#nav').innerHTML = NAV.map(group => `
-    <div class="nav-group">
-      ${group.label ? `<p class="nav-heading">${group.label}</p>` : ''}
-      ${group.items.map(key => navLink(key, user)).join('')}
-    </div>`).join('');
+  const items = MENU.filter(m => menuVisible(m, user));
+  $('#nav').innerHTML = items.map((m, i) => menuLink(m, i + 1, user)).join('');
   $('#navFoot').innerHTML = `
     ${auth.isAdmin(user) ? navLink('admin', user) : ''}
-    ${navLink('contacts', user)}
-    ${navLink('profile', user)}
     <button type="button" class="nav-link" data-act="signOut">${icon('log-out')}<span>Sign out</span></button>`;
   const unread = unreadCount(user);
   $('#bellCount').textContent = unread > 9 ? '9+' : unread;
@@ -138,6 +141,22 @@ function renderChrome() {
   $('#userBtn').innerHTML = avatar(user.name, roleColor(user.role));
   $('#userBtn').setAttribute('aria-label', `${user.name}, account menu`);
   $('#fab').hidden = !auth.can('obs.create', user) || route.view === 'observations';
+}
+
+function menuVisible(m, user) {
+  if (m.perm) return auth.can(m.perm, user);
+  return !VIEWS[m.key].meta.hideFor?.includes(user.role);
+}
+
+function menuLink(m, n, user) {
+  const v = VIEWS[m.key];
+  const active = route.view === m.key;
+  const count = v?.meta.badge ? v.meta.badge(user) : 0;
+  return `<a class="menu-item ${active ? 'on' : ''}" href="#/${m.key}" ${active ? 'aria-current="page"' : ''}>
+    <span class="menu-ic">${icon(m.icon)}</span>
+    <span class="menu-text"><b>${n}. ${m.title}</b><small>${m.desc}</small></span>
+    ${count ? `<b class="nav-count">${count}</b>` : ''}
+    <span class="menu-go">${icon('chevron-right')}</span></a>`;
 }
 
 function navLink(key, user) {
@@ -531,7 +550,7 @@ try {
 }
 setupDialog();
 setupTooltips();
-$('#brandLogo').innerHTML = logo();
+$('#brandLogo').innerHTML = `<span class="side-shield">${icon('shield-check')}</span>`;
 store.onChange(debounce(() => { if (!$('#app').hidden) renderChrome(); }, 50));
 
 if (auth.currentUser()) afterSignIn();

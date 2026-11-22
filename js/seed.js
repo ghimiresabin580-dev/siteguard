@@ -37,7 +37,7 @@ export function buildSeed() {
   });
 
   const users = [
-    user('sabin', 'u-sabin', 'Sabin Ghimire', CONFIG.mail.to, 'admin', 'Site administrator', 'c-main', '+358 40 712 4401'),
+    user('sabin', 'u-sabin', 'Sabin Ghimire', 'sabin.ghimire@siteguard.demo', 'admin', 'Site administrator', 'c-main', '+358 40 712 4401'),
     user('laura', 'u-laura', 'Laura Korhonen', 'laura.korhonen@siteguard.demo', 'manager', 'Site manager', 'c-main', '+358 40 712 4402'),
     user('aino', 'u-aino', 'Aino Virtanen', 'aino.virtanen@siteguard.demo', 'hse', 'HSE coordinator', 'c-main', '+358 40 712 4403'),
     user('juha', 'u-juha', 'Juha Mäkinen', 'juha.makinen@siteguard.demo', 'manager', 'Site engineer', 'c-main', '+358 40 712 4404'),

@@ -18,8 +18,16 @@ export function load() {
     persistent = false;
   }
   if (!data || data.version !== 2) { data = buildSeed(); save(); }
+  repairDemoAdmin();
   rollDemoDates();
   return data;
+}
+
+// Browsers that opened the demo between 9 and 22 Nov 2026 saved the administrator
+// with the FormSubmit alias as their email, which the sign-in form rejects.
+function repairDemoAdmin() {
+  const admin = data.users?.find(u => u.id === 'u-sabin');
+  if (admin && !String(admin.email).includes('@')) { admin.email = 'sabin.ghimire@siteguard.demo'; save(); }
 }
 
 export const isPersistent = () => persistent;
