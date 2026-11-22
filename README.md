@@ -26,6 +26,7 @@ The app opens with a **Get Started** screen, then sign-in, then the main menu:
 - **Report Hazard**: title, description, category, risk level, location and photos (GPS optional). High-risk reports alert the HSE coordinator.
 - **View Reports**: search, status filters (all, open, in progress, resolved), and risk or category filters. Tap a report to see it; leads can assign and close it.
 - **Site Map**: satellite map with a pin for each open hazard and those resolved in the last week.
+- **Inspections**: daily site walk, crane lift checks against the live wind, and the weekly TR measurement (not shown to workers).
 - **Statistics**: reports by risk level and by status for the last week, this month, three months or all time, plus the top categories.
 - **Settings**: profile, text size, the welcome screen, downloading reports as CSV, administration (admins) and sign out.
 
@@ -34,7 +35,7 @@ Hazard reports are the same records as the "Don't walk by" observations, so noth
 ### More pages, not in the menu yet
 
 The earlier pages are still in the code and work from links: morning meeting (`#/meeting`), look ahead (`#/lookahead`),
-deliveries (`#/deliveries`), SPA (`#/spa`), permits (`#/permits`), inspections (`#/inspections`), plant (`#/plant`),
+deliveries (`#/deliveries`), SPA (`#/spa`), permits (`#/permits`), plant (`#/plant`),
 workforce (`#/workforce`), weekly report (`#/reports`) and contacts (`#/contacts`). To show one in the menu again, add it to
 `ITEMS` in `js/views/home.js` and to `MAIN` in `js/app.js` if it should use the narrow phone layout.
 

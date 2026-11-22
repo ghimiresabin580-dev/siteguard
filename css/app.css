@@ -1008,7 +1008,7 @@ body[data-layout="full"] .view { max-width: none; padding: 0; }
 .m-link:active { transform: scale(.99); }
 .m-ic { display: grid; place-items: center; width: 46px; height: 46px; flex: none; border-radius: 12px; }
 .m-ic .ic { width: 30px; height: 30px; stroke-width: 2; }
-.m-ic.navy { color: #2c3e66; } .m-ic.amber { color: #f2a900; } .m-ic.slate { color: #37474f; } .m-ic.green { color: #2e9d47; }
+.m-ic.navy { color: #2c3e66; } .m-ic.amber { color: #f2a900; } .m-ic.slate { color: #37474f; } .m-ic.green { color: #2e9d47; } .m-ic.blue { color: #1e63d6; }
 .m-ic.amber .ic { fill: #ffca28; stroke: #3b2e00; }
 .m-ic.green .ic { fill: #c8f0cf; }
 .m-ic.plain { color: #37474f; width: 40px; }
