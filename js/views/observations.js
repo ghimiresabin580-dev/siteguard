@@ -11,6 +11,7 @@ import { OBS_TYPES, obsType, SEVERITY, OBS_STATUS } from '../domain.js';
 import { savePhoto, hydratePhotos } from '../photos.js';
 import { sendEmail, describe } from '../mail.js';
 import { notify } from '../monitor.js';
+import * as H from '../hazards.js';
 
 const filter = { status: 'open', type: '', severity: '', company: '', q: '' };
 let draftPhotos = [];
@@ -127,11 +128,12 @@ function detail(o) {
     </div>` : ''}`;
 }
 
-function openDetail(id) {
+export function openDetail(id, back = '#/observations') {
   const o = store.get('observations', id);
-  if (!o) return toast('That observation was not found.', 'err');
-  openDialog({ title: o.ref, label: obsType(o.type).label, body: detail(o), panel: true,
-    onClose: () => { if (location.hash.startsWith('#/observations/')) history.replaceState(null, '', '#/observations'); } });
+  if (!o) return toast('That report was not found.', 'err');
+  const list = back.replace(/\/obs-.*$/, '');
+  openDialog({ title: esc(o.type === 'good' ? o.ref : H.title(o)), label: `${o.ref} · ${o.type === 'hazard' ? H.category(o).label : obsType(o.type).label}`, body: detail(o), panel: true,
+    onClose: () => { if (/\/obs-/.test(location.hash)) history.replaceState(null, '', list); } });
   hydratePhotos(document.getElementById('dlg'));
 }
 

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#13263a">
+  <meta name="theme-color" content="#1b5e20">
   <title>SiteGuard</title>
-  <meta name="description" content="SiteGuard: daily safety and coordination for construction sites. Morning meeting, permits to work, SPAs, observations, deliveries and inspections.">
+  <meta name="description" content="SiteGuard: construction site safety. Report hazards with a photo and location, follow them up, and see the site on a map.">
   <meta property="og:title" content="SiteGuard">
   <meta property="og:description" content="Daily safety and coordination for construction sites: morning meeting, permits, SPAs, observations, deliveries and inspections.">
   <link rel="manifest" href="manifest.json">
@@ -35,40 +35,20 @@
   <div id="login" class="login" hidden></div>
 
   <div id="app" class="shell" hidden>
-    <aside id="sidebar" class="sidebar" aria-label="Navigation">
-      <div class="side-top">
-        <a class="brand" href="#/dashboard"><span id="brandLogo"></span><span>SiteGuard</span></a>
-        <button type="button" class="icon-btn side-close" data-act="closeNav" aria-label="Close menu">
-          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <header class="appbar">
+      <div class="appbar-in">
+        <button type="button" id="backBtn" class="hd-btn" data-act="goBack" aria-label="Back"></button>
+        <a id="appBrand" class="app-brand" href="#/home"><span id="brandLogo"></span><span>SiteGuard</span></a>
+        <h1 id="pageTitle"></h1>
+        <div id="pageActions" class="hd-actions"></div>
+        <button type="button" id="bellBtn" class="hd-btn bell" data-act="bell" aria-label="Notifications">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+          <b id="bellCount" hidden></b></button>
+        <div id="notePop" class="pop notes-pop" hidden></div>
       </div>
-      <p class="side-tag">Construction site safety</p>
-      <nav id="nav" aria-label="Main"></nav>
-      <div id="navFoot" class="nav-foot"></div>
-    </aside>
-    <div class="scrim" data-act="closeNav" aria-hidden="true"></div>
-
-    <div class="main">
-      <header class="topbar">
-        <button type="button" id="navToggle" class="icon-btn menu-btn" data-act="toggleNav" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
-          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
-        <span id="pageIcon" class="page-icon" aria-hidden="true"></span>
-        <div class="page-titles"><h1 id="pageTitle"></h1><p id="pageSub" hidden></p></div>
-        <div id="pageActions" class="page-actions"></div>
-        <div class="tools">
-          <span id="weatherChip" class="wx-chip" hidden></span>
-          <button type="button" id="bellBtn" class="icon-btn bell" data-act="bell" aria-label="Notifications">
-            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
-            <b id="bellCount" hidden></b></button>
-          <button type="button" id="userBtn" class="user-btn" data-act="account" aria-haspopup="true"></button>
-          <div id="notePop" class="pop notes-pop" hidden></div>
-          <div id="accountPop" class="pop account-pop" hidden></div>
-        </div>
-      </header>
-      <main id="view" class="view" tabindex="-1"></main>
-    </div>
-
-    <button type="button" id="fab" class="fab" data-act="raiseObservation" hidden>
-      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>Report</span></button>
+    </header>
+    <div id="subbar" class="subbar" hidden><p id="pageSub"></p><div id="subActions" class="page-actions"></div></div>
+    <main id="view" class="view" tabindex="-1"></main>
   </div>
 
   <dialog id="dlg"></dialog>

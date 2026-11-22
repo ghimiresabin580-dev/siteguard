@@ -27,19 +27,20 @@ import reports from './views/reports.js';
 import contacts from './views/contacts.js';
 import profile from './views/profile.js';
 import admin from './views/admin.js';
+import home from './views/home.js';
+import overview from './views/overview.js';
+import report from './views/report.js';
+import hazards from './views/hazardlist.js';
+import hazardMap from './views/hazardmap.js';
+import stats from './views/stats.js';
+import settings from './views/settings.js';
+import { prefs, applyPrefs } from './prefs.js';
 
-const VIEWS = { dashboard, meeting, map: sitemap, lookahead, deliveries, observations, spa, permits, inspections, plant, workforce, reports, contacts, profile, admin };
+const VIEWS = { home, overview, report, hazards, sitemap: hazardMap, stats, settings, dashboard, meeting, map: sitemap, lookahead, deliveries, observations, spa, permits, inspections, plant, workforce, reports, contacts, profile, admin };
 
-// The side menu. Other pages still exist and open from links inside the app;
-// add them back here when they are ready to show.
-const MENU = [
-  { key: 'dashboard', icon: 'layout-dashboard', title: 'Dashboard', desc: 'Overview of reported hazards and safety status.' },
-  { key: 'report', icon: 'triangle-exclamation-point', title: 'Report Hazard', desc: 'Report a hazard with description, photo and location.', perm: 'obs.create' },
-  { key: 'observations', icon: 'clipboard-check', title: 'View Reports', desc: 'View previously submitted hazard reports.' },
-  { key: 'map', icon: 'map', title: 'Site Map', desc: 'View the construction site and hazard locations.' },
-  { key: 'reports', icon: 'chart-column', title: 'Statistics', desc: 'Display total reports and hazard status.' },
-  { key: 'profile', icon: 'settings', title: 'Settings', desc: 'Basic application settings.' }
-];
+// The screens of the new design. Every other page still works from links and opens
+// in a wider layout; add it to the home menu when it should be shown again.
+const MAIN = new Set(['home', 'overview', 'report', 'hazards', 'sitemap', 'stats', 'settings']);
 
 // Every screen adds its click, submit and change handlers to one registry
 const ACTIONS = {}, SUBMITS = {}, CHANGES = {};
@@ -63,26 +64,20 @@ export const ctx = {
 // ---------- routing ----------
 function parseHash() {
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
-  return { view: VIEWS[parts[0]] ? parts[0] : 'dashboard', params: parts.slice(1) };
+  return { view: VIEWS[parts[0]] ? parts[0] : 'home', params: parts.slice(1) };
 }
 
 function show() {
   const user = auth.currentUser();
   if (!user) return showLogin();
   if (user.mustChangePassword) return showPasswordChange(user);
-  let openReport = false;
-  if (location.hash === '#/report') {
-    // "Report Hazard" opens the reports list with the new-hazard form on top
-    openReport = auth.can('obs.create', user);
-    history.replaceState(null, '', '#/observations');
-  }
   route = parseHash();
   let v = VIEWS[route.view];
   if (v.allowed && !v.allowed(user)) {
-    toast('That page is only for administrators.', 'err');
-    route = { view: 'dashboard', params: [] };
-    v = VIEWS.dashboard;
-    history.replaceState(null, '', '#/dashboard');
+    toast(v.deniedText || 'That page is only for administrators.', 'err');
+    route = { view: 'home', params: [] };
+    v = VIEWS.home;
+    history.replaceState(null, '', '#/home');
   }
   $('#login').hidden = true;
   $('#app').hidden = false;
@@ -93,16 +88,18 @@ function show() {
   renderChrome();
   renderView();
   if (!same) window.scrollTo(0, 0);
-  if (openReport) observations.openForm(ctx);
 }
 
 function renderHeader(withActions = true) {
   const head = current.header ? current.header(ctx) : { title: current.meta.label };
   $('#pageTitle').textContent = head.title;
-  $('#pageSub').textContent = head.sub || '';
-  $('#pageSub').hidden = !head.sub;
-  if (withActions) $('#pageActions').innerHTML = head.actions || '';
-  $('#pageIcon').innerHTML = icon(current.meta.icon);
+  const main = MAIN.has(current.meta.key);
+  $('#pageSub').textContent = main ? '' : head.sub || '';
+  if (withActions) {
+    $('#pageActions').innerHTML = main ? head.actions || '' : '';
+    $('#subActions').innerHTML = main ? '' : head.actions || '';
+  }
+  $('#subbar').hidden = main || (!head.sub && !head.actions);
   document.title = `${head.title} - ${CONFIG.app}`;
 }
 
@@ -112,6 +109,7 @@ function renderView() {
   renderHeader();
   root.innerHTML = current.render(ctx);
   root.dataset.view = current.meta.key;
+  document.body.dataset.layout = current.meta.full ? 'full' : MAIN.has(current.meta.key) ? 'main' : 'wide';
   current.mount?.(ctx, root);
   hydratePhotos(root);
 }
@@ -130,33 +128,14 @@ function renderChrome() {
   const user = auth.currentUser();
   if (!user) return;
   const s = store.settings();
-  const items = MENU.filter(m => menuVisible(m, user));
-  $('#nav').innerHTML = items.map((m, i) => menuLink(m, i + 1, user)).join('');
-  $('#navFoot').innerHTML = `
-    ${auth.isAdmin(user) ? navLink('admin', user) : ''}
-    <button type="button" class="nav-link" data-act="signOut">${icon('log-out')}<span>Sign out</span></button>`;
+  const isHome = !!current?.meta.home;
+  $('#backBtn').hidden = isHome;
+  $('#appBrand').hidden = !isHome;
+  $('#pageTitle').hidden = isHome;
+  $('#bellBtn').hidden = !isHome;
   const unread = unreadCount(user);
   $('#bellCount').textContent = unread > 9 ? '9+' : unread;
   $('#bellCount').hidden = !unread;
-  $('#userBtn').innerHTML = avatar(user.name, roleColor(user.role));
-  $('#userBtn').setAttribute('aria-label', `${user.name}, account menu`);
-  $('#fab').hidden = !auth.can('obs.create', user) || route.view === 'observations';
-}
-
-function menuVisible(m, user) {
-  if (m.perm) return auth.can(m.perm, user);
-  return !VIEWS[m.key].meta.hideFor?.includes(user.role);
-}
-
-function menuLink(m, n, user) {
-  const v = VIEWS[m.key];
-  const active = route.view === m.key;
-  const count = v?.meta.badge ? v.meta.badge(user) : 0;
-  return `<a class="menu-item ${active ? 'on' : ''}" href="#/${m.key}" ${active ? 'aria-current="page"' : ''}>
-    <span class="menu-ic">${icon(m.icon)}</span>
-    <span class="menu-text"><b>${n}. ${m.title}</b><small>${m.desc}</small></span>
-    ${count ? `<b class="nav-count">${count}</b>` : ''}
-    <span class="menu-go">${icon('chevron-right')}</span></a>`;
 }
 
 function navLink(key, user) {
@@ -247,7 +226,15 @@ Object.assign(ACTIONS, {
     auth.signOut();
     showLogin('You have signed out.');
   },
-  raiseObservation: () => observations.openForm(ctx),
+  raiseObservation: () => ctx.go('#/report'),
+  goBack: () => {
+    $$('.pop').forEach(p => { p.hidden = true; });
+    ctx.go(['profile', 'admin'].includes(route.view) ? '#/settings' : '#/home');
+  },
+  getStarted: () => {
+    try { sessionStorage.setItem('siteguard.started', '1'); } catch { }
+    renderLogin('signin');
+  },
   print: () => window.print(),
   // sign-in page
   demoSignIn: async el => {
@@ -270,7 +257,7 @@ Object.assign(SUBMITS, {
   async signIn(form, values, btn) {
     const res = await busy(btn, () => auth.signIn(values.email, values.password, values.remember), 'Signing in…');
     if (res.error) { showLoginError(res.error); return; }
-    if (location.hash.length < 3) history.replaceState(null, '', '#/dashboard');
+    if (location.hash.length < 3) history.replaceState(null, '', '#/home');
     afterSignIn();
   },
   async requestAccess(form, values, btn) {
@@ -319,7 +306,49 @@ function showLogin(message) {
   $('#app').hidden = true;
   $('#login').hidden = false;
   document.title = `Sign in - ${CONFIG.app}`;
-  renderLogin('signin', message);
+  let started = false;
+  try { started = !!sessionStorage.getItem('siteguard.started'); } catch { }
+  if (!message && !started && prefs().welcome) renderSplash();
+  else renderLogin('signin', message);
+}
+
+function renderSplash() {
+  document.title = CONFIG.app;
+  $('#login').innerHTML = `<div class="splash">
+      ${skylineSvg()}
+      <div class="splash-in">
+        ${logo('splash-logo')}
+        <h1 class="splash-name">Site<span>Guard</span></h1>
+        <p class="splash-tag">Construction Site Safety</p>
+      </div>
+      <button type="button" class="splash-go" data-act="getStarted">Get Started ${icon('arrow-right')}</button>
+    </div>`;
+}
+
+// Cranes and a building frame against the evening sky
+function skylineSvg() {
+  const frame = [];
+  for (let f = 0; f < 4; f++) for (let c = 0; c < 6; c++) frame.push(`<rect x="${500 + c * 32}" y="${710 - f * 42}" width="32" height="42"/>`);
+  return `<svg class="splash-sky" viewBox="0 0 800 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14202f"/><stop offset=".45" stop-color="#3b3a4a"/><stop offset=".72" stop-color="#b8643a"/><stop offset=".9" stop-color="#e9a04b"/></linearGradient></defs>
+    <rect width="800" height="800" fill="url(#sky)"/>
+    <circle cx="560" cy="640" r="70" fill="#f6c46a" opacity=".55"/>
+    <g fill="none" stroke="#0d1218" stroke-width="3" opacity=".95">
+      <path d="M120 800V430M110 800V440M130 800V440M120 430h300M120 430h-60M120 430v-44l26 44M120 386l190 44M120 386l-50 44M380 430v120"/>
+      <path d="M690 800V470M682 800V478M698 800V478M690 470H520M690 470h80M690 470v-36l-22 36M690 434l-140 36M690 434l70 36M560 470v90"/>
+      <g stroke-width="2">${frame.join('')}</g>
+    </g>
+    <rect x="0" y="752" width="800" height="48" fill="#0d1218"/>
+    <path d="M0 760 L120 740 L260 755 L400 735 L520 752 L800 742 V800 H0Z" fill="#0d1218"/>
+    <g fill="#0d1218">
+      <path d="M300 800v-118a22 22 0 0 1 22-22h20a22 22 0 0 1 22 22V800Z"/><circle cx="332" cy="630" r="22"/><path d="M306 626a26 22 0 0 1 52 0h6v8h-64v-8Z"/>
+      <path d="M390 800v-124a24 24 0 0 1 24-24h20a24 24 0 0 1 24 24V800Z"/><circle cx="424" cy="620" r="23"/><path d="M397 616a27 23 0 0 1 54 0h6v8h-66v-8Z"/>
+    </g>
+    <path d="M394 680h60v52h-60z" fill="#e36a1e" opacity=".85"/><path d="M394 694h60M394 714h60" stroke="#e8e26a" stroke-width="5"/>
+    <path d="M304 690h56v46h-56z" fill="#e3a21e" opacity=".85"/><path d="M304 704h56M304 722h56" stroke="#e8e26a" stroke-width="5"/>
+    <rect width="800" height="800" fill="#000" opacity=".18"/>
+  </svg>`;
 }
 
 function showLoginError(text) {
@@ -447,9 +476,13 @@ function renderLogin(panel = 'signin', message = '') {
   if (focus && window.innerWidth > 700) focus.focus();
 }
 
-export const logo = () => `<svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#13263a"/>
-  <path d="M16 5.5 7.5 9v6.2c0 5.4 3.6 9.6 8.5 11.3 4.9-1.7 8.5-5.9 8.5-11.3V9z" fill="#f5b800"/>
-  <path d="m12 16 3 3 5.5-6" fill="none" stroke="#13263a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// Shield with a hard hat: the SiteGuard mark
+export const logo = (cls = 'logo') => `<svg class="${cls}" viewBox="0 0 64 72" aria-hidden="true">
+  <path d="M32 3 6 13v19c0 17 11 30 26 37 15-7 26-20 26-37V13Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M16 44h32" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  <path d="M19 42c0-9 5.5-15.5 13-15.5S45 33 45 42Z" fill="currentColor"/>
+  <path d="M32 26.5V36" stroke="var(--logo-gap, #1d5a22)" stroke-width="3"/>
+  <path d="M23 52c2.6 2.6 5.6 4 9 4s6.4-1.4 9-4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
 
 function showPasswordChange(user) {
   $('#login').hidden = true;
@@ -497,7 +530,7 @@ document.addEventListener('submit', async e => {
   const invalid = [...form.elements].find(el => el.willValidate && !el.checkValidity());
   if (invalid) {
     invalid.focus();
-    const label = invalid.closest('label, fieldset')?.querySelector('.field-label')?.textContent || 'This field';
+    const label = (invalid.closest('label, fieldset')?.querySelector('.field-label, .m-field > span:first-child, .m-field > legend')?.textContent || 'This field').replace('*', '').trim();
     if (invalid.type === 'checkbox') toast('Tick every box that is needed before saving.', 'err');
     else toast(invalid.validity.valueMissing ? `${label}: fill this in.` : `${label}: ${invalid.validationMessage}`, 'err');
     return;
@@ -550,7 +583,9 @@ try {
 }
 setupDialog();
 setupTooltips();
-$('#brandLogo').innerHTML = `<span class="side-shield">${icon('shield-check')}</span>`;
+applyPrefs();
+$('#brandLogo').innerHTML = logo('brand-logo');
+$('#backBtn').innerHTML = icon('arrow-left');
 store.onChange(debounce(() => { if (!$('#app').hidden) renderChrome(); }, 50));
 
 if (auth.currentUser()) afterSignIn();

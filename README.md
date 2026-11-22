@@ -18,20 +18,25 @@ Pick a demo account on the sign-in page. They all use the password `SiteGuard202
 | Supervisor | Plan work, write SPAs, sign the crew on, request permits, book deliveries |
 | Worker | Raise observations, sign SPAs, check in and out |
 
-## What is in it
+## Screens
 
-- **Dashboard**: people on site, activities, permits, open observations, deliveries, days without a lost-time injury, and a "needs attention" list.
-- **Morning meeting**: today's risks and hazards, companies on site with their SPA signatures, activities, exclusion zones on the map, deliveries, key messages and attendance. Print it or email it.
-- **Site map**: satellite map of the site with zones, gates, fences and routes. Leads draw exclusion zones straight on the map.
-- **Look ahead**: two weeks of planned work per company, with hazards, SPA and permits.
-- **Deliveries**: gate bookings with clash warnings when two lorries are booked at the same gate.
-- **Don't walk by**: hazards, near misses, unsafe acts, housekeeping and good practice, with photos, GPS, assignment and close-out.
-- **SPA**: steps, hazards, controls and PPE, signed by each crew member with a finger on the screen.
-- **Permits to work**: hot work, excavation, working at height, confined space, lifting and electrical isolation, with checklists, approval and printable permits.
-- **Inspections**: daily site walk, lift checks against the live wind (lifts are blocked above the crane's limit), and the weekly TR measurement.
-- **Plant and equipment**: inspection dates, with an email when one is about to run out or has expired.
-- **Workforce**: check-in, inductions, occupational safety, hot work, first aid and SFS 6002 cards, tax numbers.
-- **Weekly report**: observations, TR index trend, hotspots on the map, and anything running out. Print, CSV or email.
+The app opens with a **Get Started** screen, then sign-in, then the main menu:
+
+- **Dashboard**: total, open and resolved reports, this month's count, and the latest reports.
+- **Report Hazard**: title, description, category, risk level, location and photos (GPS optional). High-risk reports alert the HSE coordinator.
+- **View Reports**: search, status filters (all, open, in progress, resolved), and risk or category filters. Tap a report to see it; leads can assign and close it.
+- **Site Map**: satellite map with a pin for each open hazard and those resolved in the last week.
+- **Statistics**: reports by risk level and by status for the last week, this month, three months or all time, plus the top categories.
+- **Settings**: profile, text size, the welcome screen, downloading reports as CSV, administration (admins) and sign out.
+
+Hazard reports are the same records as the "Don't walk by" observations, so nothing was lost in the redesign.
+
+### More pages, not in the menu yet
+
+The earlier pages are still in the code and work from links: morning meeting (`#/meeting`), look ahead (`#/lookahead`),
+deliveries (`#/deliveries`), SPA (`#/spa`), permits (`#/permits`), inspections (`#/inspections`), plant (`#/plant`),
+workforce (`#/workforce`), weekly report (`#/reports`) and contacts (`#/contacts`). To show one in the menu again, add it to
+`ITEMS` in `js/views/home.js` and to `MAIN` in `js/app.js` if it should use the narrow phone layout.
 
 ## Email notifications
 
@@ -72,6 +77,8 @@ js/auth.js          accounts, roles and permissions
 js/mail.js          email through FormSubmit, outbox and retries
 js/weather.js       live weather from Open-Meteo
 js/monitor.js       background checks (inspections, permits, cards)
+js/hazards.js       hazard titles, categories, risk levels and list rows
+js/prefs.js         text size and welcome screen (per device)
 js/views/*.js       one file per page
 ```
 
