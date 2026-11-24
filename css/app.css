@@ -1366,3 +1366,92 @@ body[data-layout="main"] .tabs { border: 0; gap: 8px; margin-bottom: 14px; }
 body[data-layout="main"] .tabs .tab { border: 1px solid #d5dbd7; border-radius: 20px; background: #fff; color: var(--text); padding: 7px 15px; font: 500 15px var(--font); }
 body[data-layout="main"] .tabs .tab.on { background: var(--green); border-color: var(--green); color: #fff; }
 .hero-facts { align-items: start; }
+
+/* =====================================================================
+   Finish pass: green header band, menu tiles, checklist colours,
+   frosted bottom bar, profile card
+   ===================================================================== */
+:root {
+  --concrete: #eef2ee;
+  --card-line: #e0e7e1;
+  --lift: 0 1px 2px rgba(16, 40, 20, .05), 0 8px 20px -12px rgba(16, 40, 20, .18);
+  --lift-hover: 0 2px 4px rgba(16, 40, 20, .06), 0 14px 28px -12px rgba(16, 40, 20, .26);
+}
+body { overflow-x: clip; }
+.appbar { background: var(--green); }
+.m-card, .tpl, .tile, .ck { border-color: var(--card-line); box-shadow: var(--lift); }
+.m-card.m-link:hover, .stat:hover, .tpl:hover { box-shadow: var(--lift-hover); }
+
+/* the header colour runs down behind the first card on overview screens */
+body[data-layout="main"]:is([data-view="home"], [data-view="overview"], [data-view="inspections"], [data-view="stats"], [data-view="settings"]) .appbar { box-shadow: none; }
+body[data-layout="main"]:is([data-view="home"], [data-view="overview"], [data-view="inspections"], [data-view="stats"], [data-view="settings"]) .view { position: relative; isolation: isolate; }
+body[data-layout="main"]:is([data-view="home"], [data-view="overview"], [data-view="inspections"], [data-view="stats"], [data-view="settings"]) .view::before {
+  content: ''; position: absolute; z-index: -1; top: 0; left: 50%; width: 100vw; transform: translateX(-50%); height: 78px;
+  background: var(--green); border-radius: 0 0 28px 28px; }
+@media (min-width: 761px) {
+  body[data-layout="main"]:is([data-view="home"], [data-view="overview"], [data-view="inspections"], [data-view="stats"], [data-view="settings"]) .view::before { border-radius: 0; height: 84px; }
+}
+
+/* home: status panel sits on the band, with a faint site-plan grid */
+.hero { box-shadow: 0 14px 30px -14px rgba(0, 0, 0, .55);
+  background-color: var(--forest-deep);
+  background-image: linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+  background-size: 22px 22px; background-position: -1px -1px; }
+.hero-cta { box-shadow: 0 4px 0 #c99a00; transition: transform .1s, box-shadow .1s; }
+.hero-cta:active { transform: translateY(3px); box-shadow: 0 1px 0 #c99a00; }
+
+/* home: menu tiles */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 640px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tile { display: grid; align-content: start; gap: 2px; min-height: 124px; padding: 14px; background: #fff; border: 1px solid var(--card-line); border-radius: 16px;
+  color: var(--text); text-decoration: none; transition: box-shadow .15s, transform .15s; }
+.tile:hover { color: var(--text); box-shadow: var(--lift-hover); }
+.tile:active { transform: scale(.98); }
+.tile:focus-visible { outline: 3px solid var(--green-btn); outline-offset: 2px; }
+.tile .m-ic { width: 44px; height: 44px; margin-bottom: 10px; }
+.tile .m-ic .ic { width: 24px; height: 24px; }
+.tile b { font: 700 18px/1.15 'Barlow Semi Condensed', var(--font); }
+.tile small { color: #56625a; font-size: 13.5px; line-height: 1.3; }
+.m-ic.amber .ic { fill: none; stroke: #8a5a00; }
+.m-ic.amber { color: #8a5a00; }
+
+/* dashboard: number colour follows the card */
+.stat { min-height: 128px; }
+.stat-ic.amber { background: #fff4cc; color: #8a5a00; } .stat-ic.amber .ic { fill: none; width: 22px; height: 22px; }
+.stat-ic.green { border-radius: 10px; }
+.st-amber b { color: #8a5a00; } .st-green b { color: #1f7a33; } .st-purple b { color: #5b2fb3; } .st-blue b { color: #1a4fb0; }
+
+/* checklist colours */
+.tpl-ic.t-amber { background: #fff1c7; color: #8a5a00; }
+.tpl-ic.t-blue { background: #e4eefc; color: #1e5bc6; }
+.tpl-ic.t-green { background: #e1f3e4; color: #1f7a33; }
+.tpl-ic.t-earth { background: #f3eadf; color: #7a4a22; }
+.tpl-ic.t-red { background: #fde6e3; color: #c62828; }
+.tpl-ic.t-violet { background: #efe8fb; color: #6237bd; }
+.tpl-ic.t-teal { background: #dcf2ee; color: #00796b; }
+.tpl-ic.t-orange { background: #ffebd9; color: #b55400; }
+.tpl { border-radius: 16px; transition: box-shadow .15s, transform .15s; }
+.tpl:active { transform: scale(.98); }
+.insp-sum { border-radius: 16px; }
+
+/* report rows */
+.thumb { border-radius: 12px; }
+.h-row { padding: 13px 0; }
+.m-card.list { border-radius: 16px; }
+
+/* settings: who is signed in */
+.me-card { display: flex; align-items: center; gap: 14px; padding: 16px; margin-bottom: 12px; border-radius: 16px; color: var(--text); text-decoration: none; }
+.me-card:hover { color: var(--text); box-shadow: var(--lift-hover); }
+.me-card .avatar { width: 54px; height: 54px; font: 700 19px/1 'Barlow Semi Condensed', var(--font); background: var(--forest-deep); color: var(--hivis); }
+.me-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.me-text b { font: 700 20px/1.2 'Barlow Semi Condensed', var(--font); }
+.me-text small { color: #56625a; font-size: 14px; }
+.me-edit { flex: none; padding: 5px 12px; border-radius: 16px; background: var(--green-soft); color: var(--green); font: 600 14px var(--font); }
+
+/* bottom bar: frosted, with a clear current tab */
+@media (max-width: 760px) {
+  .tabbar { background: rgba(255, 255, 255, .88); -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6); border-top-color: rgba(20, 40, 25, .08); }
+  .tb.on .tb-l { font-weight: 700; }
+  .tb.on .tb-ic { background: #dcefdf; }
+  .tb-main .tb-ic { box-shadow: 0 6px 16px -4px rgba(140, 100, 0, .55); }
+}

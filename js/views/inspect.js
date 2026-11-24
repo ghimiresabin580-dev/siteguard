@@ -74,7 +74,7 @@ function hub() {
     <div class="tpl-grid">${C.TEMPLATES.map(t => {
       const last = C.lastFor(t.key);
       return `<a class="tpl" href="#/inspections/run/${t.key}">
-        <span class="tpl-ic">${icon(t.icon)}</span>
+        <span class="tpl-ic t-${t.tone}">${icon(t.icon)}</span>
         <b>${t.title}</b>
         <small>${esc(t.every)}</small>
         <em>${t.items.length} checks, ${last ? `last done ${timeAgo(last.createdAt)}` : 'not done yet'}</em>
@@ -129,7 +129,7 @@ function runHtml() {
   const t = run.tpl;
   return `<div class="run">
     <header class="run-head m-card">
-      <span class="tpl-ic lg">${icon(t.icon)}</span>
+      <span class="tpl-ic lg t-${t.tone}">${icon(t.icon)}</span>
       <div><b>${t.title} inspection</b><small>${t.items.length} checks. ${esc(t.every)}.</small></div>
     </header>
     <div class="run-prog" id="runProg">${progressHtml()}</div>

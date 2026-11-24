@@ -6,7 +6,7 @@ import { today, addDays } from './util.js';
 // critical: a failed answer raises a high-risk hazard instead of medium
 export const TEMPLATES = [
   {
-    key: 'scaffold', title: 'Scaffold', icon: 'construction', every: 'Weekly and after bad weather', items: [
+    key: 'scaffold', tone: 'amber', title: 'Scaffold', icon: 'construction', every: 'Weekly and after bad weather', items: [
       { t: 'Scaffold tag is in place and in date', critical: true },
       { t: 'Base plates and sole boards are sound and level' },
       { t: 'Guardrails, mid-rails and toe boards are complete', critical: true },
@@ -18,7 +18,7 @@ export const TEMPLATES = [
     ]
   },
   {
-    key: 'ladder', title: 'Ladder', icon: 'arrow-up-to-line', every: 'Before each use', items: [
+    key: 'ladder', tone: 'blue', title: 'Ladder', icon: 'arrow-up-to-line', every: 'Before each use', items: [
       { t: 'Stiles are straight and undamaged' },
       { t: 'Rungs, feet and locking bars are intact', critical: true },
       { t: 'Standing on firm, level ground at about 1 in 4' },
@@ -27,7 +27,7 @@ export const TEMPLATES = [
     ]
   },
   {
-    key: 'ppe', title: 'PPE', icon: 'hard-hat', every: 'Daily, at the gate', items: [
+    key: 'ppe', tone: 'green', title: 'PPE', icon: 'hard-hat', every: 'Daily, at the gate', items: [
       { t: 'Hard hat is worn and within its date' },
       { t: 'High-visibility clothing is clean and visible' },
       { t: 'Safety boots are worn' },
@@ -38,7 +38,7 @@ export const TEMPLATES = [
     ]
   },
   {
-    key: 'excavation', title: 'Excavation', icon: 'shovel', every: 'Daily, before work starts', items: [
+    key: 'excavation', tone: 'earth', title: 'Excavation', icon: 'shovel', every: 'Daily, before work starts', items: [
       { t: 'Edge protection is at least 1 m back from the edge', critical: true },
       { t: 'Sides are shored or battered back as planned', critical: true },
       { t: 'Spoil heaps are at least 1 m from the edge' },
@@ -49,7 +49,7 @@ export const TEMPLATES = [
     ]
   },
   {
-    key: 'fire', title: 'Fire and hot work', icon: 'flame', every: 'Before and after hot work', items: [
+    key: 'fire', tone: 'red', title: 'Fire and hot work', icon: 'flame', every: 'Before and after hot work', items: [
       { t: 'Hot work permit is valid and on site', critical: true },
       { t: 'Extinguishers are present and in date' },
       { t: 'Combustibles are cleared or covered within 10 m' },
@@ -59,7 +59,7 @@ export const TEMPLATES = [
     ]
   },
   {
-    key: 'electrical', title: 'Electrical', icon: 'zap', every: 'Weekly', items: [
+    key: 'electrical', tone: 'violet', title: 'Electrical', icon: 'zap', every: 'Weekly', items: [
       { t: 'Distribution boards are closed, locked and labelled' },
       { t: 'Residual current devices tested this week', critical: true },
       { t: 'Cables run overhead or are protected on walkways' },
@@ -68,7 +68,7 @@ export const TEMPLATES = [
     ]
   },
   {
-    key: 'housekeeping', title: 'Housekeeping', icon: 'recycle', every: 'Daily', items: [
+    key: 'housekeeping', tone: 'teal', title: 'Housekeeping', icon: 'recycle', every: 'Daily', items: [
       { t: 'Walkways and stairs are clear' },
       { t: 'Materials are stacked stable and banded' },
       { t: 'Waste is sorted into the right skips' },
@@ -77,7 +77,7 @@ export const TEMPLATES = [
     ]
   },
   {
-    key: 'plant', title: 'Mobile plant', icon: 'tractor', every: 'Before each shift', items: [
+    key: 'plant', tone: 'orange', title: 'Mobile plant', icon: 'tractor', every: 'Before each shift', items: [
       { t: 'Daily check is filled in the log book' },
       { t: 'Lights, beacon and reversing alarm work' },
       { t: 'Seat belt is fitted and worn', critical: true },

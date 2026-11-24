@@ -118,6 +118,7 @@ function renderView() {
   current.unmount?.(ctx);
   renderHeader();
   root.innerHTML = current.render(ctx);
+  document.body.dataset.view = current.meta.key + (location.hash.split('/')[2] ? '-' + location.hash.split('/')[2] : '');
   const moved = root.dataset.view !== current.meta.key || root.dataset.at !== location.hash.split('/')[2];
   root.dataset.view = current.meta.key;
   root.dataset.at = location.hash.split('/')[2] || '';

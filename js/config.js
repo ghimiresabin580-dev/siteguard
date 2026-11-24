@@ -4,7 +4,7 @@
 
 export const CONFIG = {
   app: 'SiteGuard',
-  version: '2.1',
+  version: '2.2',
 
   site: {
     name: 'Malmi Airfield',

@@ -7,15 +7,27 @@ import { can, currentUser } from '../auth.js';
 import { esc, today, dayOf } from '../util.js';
 import { icon } from '../icons.js';
 
+// Report Hazard is not a tile: the status panel, the bottom bar and the header all carry it
 const ITEMS = [
-  { href: '#/overview', icon: 'chart-column', tone: 'navy', title: 'Dashboard', desc: 'Overview of safety and hazards' },
-  { href: '#/report', icon: 'triangle-exclamation-point', tone: 'amber', title: 'Report Hazard', desc: 'Report a new safety hazard', perm: 'obs.create' },
-  { href: '#/hazards', icon: 'clipboard-list', tone: 'slate', title: 'View Reports', desc: 'See all reported hazards' },
-  { href: '#/inspections', icon: 'clipboard-check', tone: 'blue', title: 'Inspections', desc: 'Checklists for scaffolds, PPE and more' },
-  { href: '#/sitemap', icon: 'map-pin', tone: 'green', title: 'Site Map', desc: 'View site and hazard locations' },
-  { href: '#/stats', icon: 'chart-column', tone: 'teal', title: 'Statistics', desc: 'Safety reports and analysis' },
-  { href: '#/settings', icon: 'settings', tone: 'slate', title: 'Settings', desc: 'App and user settings' }
+  { href: '#/overview', icon: 'layout-dashboard', tone: 'navy', title: 'Dashboard', desc: 'Totals and latest reports' },
+  { href: '#/hazards', icon: 'clipboard-list', tone: 'amber', title: 'View Reports', desc: 'Every reported hazard' },
+  { href: '#/inspections', icon: 'clipboard-check', tone: 'blue', title: 'Inspections', desc: 'Scaffold, PPE and more' },
+  { href: '#/sitemap', icon: 'map-pin', tone: 'green', title: 'Site Map', desc: 'Hazards on the site plan' },
+  { href: '#/stats', icon: 'chart-column', tone: 'teal', title: 'Statistics', desc: 'Trends and categories' },
+  { href: '#/settings', icon: 'settings', tone: 'slate', title: 'Settings', desc: 'Profile and app options' }
 ];
+
+const ORDER = { high: 0, medium: 1, low: 2 };
+
+// The open hazards that most need someone: highest risk first, then newest
+function attention() {
+  const list = H.all().filter(H.isOpen)
+    .sort((a, b) => (ORDER[a.severity] ?? 3) - (ORDER[b.severity] ?? 3) || b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 3);
+  if (!list.length) return '';
+  return `<div class="m-head"><h2>Needs attention</h2><a href="#/hazards/open">All open</a></div>
+    <div class="m-card list">${list.map(o => H.row(o, { status: false })).join('')}</div>`;
+}
 
 function greeting() {
   const h = new Date().getHours();
@@ -50,10 +62,10 @@ function status() {
 export default {
   meta: { key: 'home', label: 'SiteGuard', icon: 'shield-check', home: true },
   render: () => `${status()}
-    <nav class="m-menu" aria-label="Main menu">${ITEMS.filter(i => !i.perm || can(i.perm)).map(i => `
-    <a class="m-card m-link" href="${i.href}">
-      <span class="m-ic ${i.tone}">${icon(i.icon)}</span>
-      <span class="m-text"><b>${i.title}</b><small>${i.desc}</small></span>
-      <span class="m-go">${icon('chevron-right')}</span>
-    </a>`).join('')}</nav>`
+    <nav class="tiles" aria-label="Main menu">${ITEMS.map(i => `
+      <a class="tile" href="${i.href}">
+        <span class="m-ic ${i.tone}">${icon(i.icon)}</span>
+        <b>${i.title}</b><small>${i.desc}</small>
+      </a>`).join('')}</nav>
+    ${attention()}`
 };

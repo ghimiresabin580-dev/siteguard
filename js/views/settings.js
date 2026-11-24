@@ -6,7 +6,7 @@ import { CONFIG } from '../config.js';
 import { isAdmin, ROLES, currentUser } from '../auth.js';
 import { esc, today, toCSV, download, fmtDateTime } from '../util.js';
 import { icon } from '../icons.js';
-import { openDialog, closeDialog, toast } from '../ui.js';
+import { openDialog, closeDialog, toast, avatar } from '../ui.js';
 import { prefs, setPrefs } from '../prefs.js';
 
 const card = (ic, title, desc, attrs) => `
@@ -20,14 +20,17 @@ export default {
   meta: { key: 'settings', label: 'Settings', icon: 'settings' },
   render: ctx => {
     const u = ctx.user;
-    return `<div class="m-menu">
-      ${card('user-round', 'User Profile', 'Edit your account', 'href="#/profile"')}
+    return `<a class="m-card me-card" href="#/profile">
+      ${avatar(u.name, '', 'lg')}
+      <span class="me-text"><b>${esc(u.name)}</b><small>${esc(ROLES[u.role].label)}, ${esc(store.settings().siteName)}</small></span>
+      <span class="me-edit">Edit</span>
+    </a>
+    <div class="m-menu">
       ${card('settings', 'App Settings', 'Text size and welcome screen', 'data-act="stApp"')}
       ${card('database', 'Data & Storage', 'Report data and backup', 'data-act="stData"')}
       ${isAdmin(u) ? card('shield-check', 'Administration', 'Users, access requests and email', 'href="#/admin"') : ''}
       ${card('info', 'About', 'App version and information', 'data-act="stAbout"')}
     </div>
-    <p class="m-who">Signed in as <b>${esc(u.name)}</b>, ${esc(ROLES[u.role].label.toLowerCase())}</p>
     <button type="button" class="m-btn ghost" data-act="signOut">${icon('log-out')}Sign out</button>`;
   },
 

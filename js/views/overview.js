@@ -9,7 +9,7 @@ function html() {
   const resolved = list.filter(o => o.status === 'closed').length;
   const month = list.filter(H.thisMonth).length;
   const stat = (ic, tone, value, label, href, sub = '') => `
-    <a class="m-card stat" href="${href}">
+    <a class="m-card stat st-${tone}" href="${href}">
       <span class="stat-ic ${tone}">${icon(ic)}</span>
       <b class="${typeof value === 'string' ? 'word' : ''}">${value}</b><small>${label}</small>${sub ? `<em>${sub}</em>` : ''}
     </a>`;
@@ -19,7 +19,7 @@ function html() {
       ${stat('file-text', 'blue', list.length, 'Total Reports', '#/hazards/all')}
       ${stat('triangle-exclamation-point', 'amber', open, 'Open', '#/hazards/open')}
       ${stat('circle-check', 'green', resolved, 'Resolved', '#/hazards/closed')}
-      ${stat('calendar-days', 'purple', 'This Month', `${month} Reports`, '#/stats')}
+      ${stat('calendar-days', 'purple', month, 'This Month', '#/stats')}
     </div>
     <div class="m-head"><h2>Recent Reports</h2><a href="#/hazards">View All</a></div>
     <div class="m-card list">${recent.length ? recent.map(o => H.row(o, { status: false, place: false })).join('')
