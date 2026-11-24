@@ -149,10 +149,10 @@ function body(tab) {
 const tabFrom = ctx => (['lifts', 'tr'].includes(ctx.route.params[0]) ? ctx.route.params[0] : 'walk');
 
 export default {
-  meta: { key: 'inspections', hideFor: ['worker'], label: 'Inspections', icon: 'clipboard-check' },
+  meta: { key: 'checks', hideFor: ['worker'], label: 'Site checks', icon: 'clipboard-check' },
 
   header: ctx => ({
-    title: 'Inspections',
+    title: { walk: 'Daily Site Walk', lifts: 'Lift Checks', tr: 'TR Measurement' }[tabFrom(ctx)],
     sub: { walk: 'Check every zone, gate, fence and route once a shift', lifts: 'Checks before every crane lift, with the wind on site', tr: 'Weekly TR safety measurement (TR-mittari)' }[tabFrom(ctx)]
   }),
 
@@ -164,7 +164,7 @@ export default {
   },
 
   actions: {
-    inspTab: (el, ctx) => ctx.go(el.dataset.key === 'walk' ? '#/inspections' : `#/inspections/${el.dataset.key}`),
+    inspTab: (el, ctx) => ctx.go(el.dataset.key === 'walk' ? '#/checks' : `#/checks/${el.dataset.key}`),
     walkMark(el, ctx) {
       const it = store.get('items', el.dataset.id);
       const result = +el.dataset.result;

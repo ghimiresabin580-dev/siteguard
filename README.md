@@ -20,13 +20,13 @@ Pick a demo account on the sign-in page. They all use the password `SiteGuard202
 
 ## Screens
 
-The app opens with a **Get Started** screen, then sign-in, then the main menu:
+The app opens with a **Get Started** screen, then sign-in, then the home screen. Home shows how the site is doing (open and high-risk hazards, inspections today) with a quick **Report a hazard** button, then the main menu. On phones a bottom bar gives one-tap access to Home, Reports, Report, Inspect and Map.
 
 - **Dashboard**: total, open and resolved reports, this month's count, and the latest reports.
 - **Report Hazard**: title, description, category, risk level, location and photos (GPS optional). High-risk reports alert the HSE coordinator.
 - **View Reports**: search, status filters (all, open, in progress, resolved), and risk or category filters. Tap a report to see it; leads can assign and close it.
 - **Site Map**: satellite map with a pin for each open hazard and those resolved in the last week.
-- **Inspections**: daily site walk, crane lift checks against the live wind, and the weekly TR measurement (not shown to workers).
+- **Inspections**: checklists anyone can run (scaffold, ladder, PPE, excavation, fire and hot work, electrical, housekeeping, mobile plant). Each check is Pass, Fail or N/A, with a note and photo for failures. The score is passed ÷ (passed + failed). Failed checks can be reported as hazards automatically; failed critical checks become high risk. Site leads also get the daily site walk (`#/checks`), lift checks (`#/checks/lifts`) and TR measurement (`#/checks/tr`) here.
 - **Statistics**: reports by risk level and by status for the last week, this month, three months or all time, plus the top categories.
 - **Settings**: profile, text size, the welcome screen, downloading reports as CSV, administration (admins) and sign out.
 
@@ -79,6 +79,7 @@ js/mail.js          email through FormSubmit, outbox and retries
 js/weather.js       live weather from Open-Meteo
 js/monitor.js       background checks (inspections, permits, cards)
 js/hazards.js       hazard titles, categories, risk levels and list rows
+js/checklists.js    inspection templates, scoring and demo inspections
 js/prefs.js         text size and welcome screen (per device)
 js/views/*.js       one file per page
 ```

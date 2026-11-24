@@ -96,7 +96,7 @@ export default {
   header: () => ({
     title: 'Site map',
     sub: `${store.settings().siteName}: zones, routes, gates and exclusion zones`,
-    actions: can('check.do') ? `<a class="btn ghost" href="#/inspections">${icon('clipboard-check')}<span>Daily site walk</span></a>` : ''
+    actions: can('check.do') ? `<a class="btn ghost" href="#/checks">${icon('clipboard-check')}<span>Daily site walk</span></a>` : ''
   }),
 
   render: () => `

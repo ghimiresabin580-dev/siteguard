@@ -59,7 +59,7 @@ function attentionItems(user) {
     for (const p of blocked) add('danger', 'id-card', `${p.name} is on site but not cleared`, D.personState(p).problems.join(', '), '#/workforce', 'Check');
   }
   if (can('meeting.run', user) && !D.briefingOn(T) && !isWeekend(T)) add('info', 'sunrise', 'Morning meeting not recorded yet', 'Go through today’s hazards, activities and exclusion zones.', '#/meeting', 'Start');
-  if (can('tr.do', user) && !D.trThisWeek() && new Date().getDay() >= 3) add('info', 'clipboard-check', 'TR measurement due this week', 'Walk the site and record this week’s TR index.', '#/inspections/tr', 'Start');
+  if (can('tr.do', user) && !D.trThisWeek() && new Date().getDay() >= 3) add('info', 'clipboard-check', 'TR measurement due this week', 'Walk the site and record this week’s TR index.', '#/checks/tr', 'Start');
   if (user.role === 'admin') {
     const pending = store.all('users').filter(u => u.status === 'pending');
     if (pending.length) add('info', 'user-plus', `${plural(pending.length, 'access request')} to review`, pending.map(u => u.name).join(', '), '#/admin', 'Review');

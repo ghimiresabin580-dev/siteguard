@@ -20,7 +20,8 @@ import deliveries from './views/deliveries.js';
 import observations from './views/observations.js';
 import spa from './views/spa.js';
 import permits from './views/permits.js';
-import inspections from './views/inspections.js';
+import checks from './views/inspections.js';
+import inspections from './views/inspect.js';
 import plant from './views/plant.js';
 import workforce from './views/workforce.js';
 import reports from './views/reports.js';
@@ -36,11 +37,20 @@ import stats from './views/stats.js';
 import settings from './views/settings.js';
 import { prefs, applyPrefs } from './prefs.js';
 
-const VIEWS = { home, overview, report, hazards, sitemap: hazardMap, stats, settings, dashboard, meeting, map: sitemap, lookahead, deliveries, observations, spa, permits, inspections, plant, workforce, reports, contacts, profile, admin };
+const VIEWS = { home, overview, report, hazards, sitemap: hazardMap, stats, settings, dashboard, meeting, map: sitemap, lookahead, deliveries, observations, spa, permits, inspections, checks, plant, workforce, reports, contacts, profile, admin };
 
 // The screens of the new design. Every other page still works from links and opens
 // in a wider layout; add it to the home menu when it should be shown again.
-const MAIN = new Set(['home', 'overview', 'report', 'hazards', 'sitemap', 'stats', 'settings']);
+const MAIN = new Set(['home', 'overview', 'report', 'hazards', 'sitemap', 'stats', 'settings', 'inspections', 'checks']);
+
+// Bottom bar on phones. "Report" sits in the middle as the main action.
+const TABS = [
+  ['home', '#/home', 'layout-dashboard', 'Home', ['home', 'overview', 'stats', 'settings', 'profile']],
+  ['hazards', '#/hazards', 'clipboard-list', 'Reports', ['hazards']],
+  ['report', '#/report', 'plus', 'Report', ['report']],
+  ['inspections', '#/inspections', 'clipboard-check', 'Inspect', ['inspections', 'checks']],
+  ['sitemap', '#/sitemap', 'map', 'Map', ['sitemap']]
+];
 
 // Every screen adds its click, submit and change handlers to one registry
 const ACTIONS = {}, SUBMITS = {}, CHANGES = {};
@@ -108,7 +118,10 @@ function renderView() {
   current.unmount?.(ctx);
   renderHeader();
   root.innerHTML = current.render(ctx);
+  const moved = root.dataset.view !== current.meta.key || root.dataset.at !== location.hash.split('/')[2];
   root.dataset.view = current.meta.key;
+  root.dataset.at = location.hash.split('/')[2] || '';
+  if (moved) { root.classList.remove('enter'); void root.offsetWidth; root.classList.add('enter'); }
   document.body.dataset.layout = current.meta.full ? 'full' : MAIN.has(current.meta.key) ? 'main' : 'wide';
   current.mount?.(ctx, root);
   hydratePhotos(root);
@@ -133,6 +146,11 @@ function renderChrome() {
   $('#appBrand').hidden = !isHome;
   $('#pageTitle').hidden = isHome;
   $('#bellBtn').hidden = !isHome;
+  $('#tabbar').innerHTML = TABS.filter(t => t[0] !== 'report' || auth.can('obs.create', user)).map(([key, href, ic, label, views]) => {
+    const on = views.includes(route.view);
+    return `<a class="tb ${key === 'report' ? 'tb-main' : ''} ${on ? 'on' : ''}" href="${href}" ${on ? 'aria-current="page"' : ''}>
+      <span class="tb-ic">${icon(ic)}</span><span class="tb-l">${label}</span></a>`;
+  }).join('');
   const unread = unreadCount(user);
   $('#bellCount').textContent = unread > 9 ? '9+' : unread;
   $('#bellCount').hidden = !unread;
@@ -229,7 +247,9 @@ Object.assign(ACTIONS, {
   raiseObservation: () => ctx.go('#/report'),
   goBack: () => {
     $$('.pop').forEach(p => { p.hidden = true; });
-    ctx.go(['profile', 'admin'].includes(route.view) ? '#/settings' : '#/home');
+    const up = { profile: '#/settings', admin: '#/settings', checks: '#/inspections' };
+    if (route.view === 'inspections' && route.params[0] === 'run') return ctx.go('#/inspections');
+    ctx.go(up[route.view] || '#/home');
   },
   getStarted: () => {
     try { sessionStorage.setItem('siteguard.started', '1'); } catch { }
